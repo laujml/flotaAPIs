@@ -67,4 +67,14 @@ export class VehiclesController {
   checkMaintenanceAlerts(@Param('id', ParseIntPipe) id: number) {
     return this.vehiclesService.checkMaintenanceAlerts(id);
   }
+
+  @Get(':id/cost-analysis')
+  getVehicleCostAnalysis(@Param('id', ParseIntPipe) id: number) {
+    return this.vehiclesService.getVehicleCostAnalysis(id);
+  }
+
+  @Get(':id/performance-anomaly')
+  detectPerformanceAnomaly(@Param('id', ParseIntPipe) id: number) {
+    return this.vehiclesService.detectPerformanceAnomaly(id);
+  }
 }

@@ -179,6 +179,169 @@ describe('VehiclesService', () => {
     });
   });
 
+  describe('setVehicleState', () => {
+    it('should allow valid state transitions', async () => {
+      mockPrismaService.vehicle.findUnique.mockResolvedValue(mockVehicle);
+      mockPrismaService.vehicle.update.mockResolvedValue({
+        ...mockVehicle,
+        state: 'in_trip',
+      });
+
+      const result = await service.setVehicleState(1, 'in_trip');
+
+      expect(result.state).toBe('in_trip');
+    });
+
+    it('should block invalid state transitions', async () => {
+      mockPrismaService.vehicle.findUnique.mockResolvedValue(mockVehicle);
+
+      await expect(service.setVehicleState(1, 'maintenance_overdue')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+  });
+
+  describe('getVehicleCostAnalysis', () => {
+    it('should calculate cost per km correctly', async () => {
+      const vehicleWithMaintenance = {
+        ...mockVehicle,
+        maintenanceSchedule: [
+          {
+            id: 1,
+            vehicleId: 1,
+            type: 'oil_change',
+            scheduledOdometer: null,
+            scheduledDate: null,
+            completedDate: new Date(),
+            cost: 500,
+            description: null,
+            isCompleted: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            id: 2,
+            vehicleId: 1,
+            type: 'tire_rotation',
+            scheduledOdometer: null,
+            scheduledDate: null,
+            completedDate: new Date(),
+            cost: 250,
+            description: null,
+            isCompleted: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      };
+
+      mockPrismaService.vehicle.findUnique.mockResolvedValue(vehicleWithMaintenance);
+
+      const result = await service.getVehicleCostAnalysis(1);
+
+      expect(result.totalMaintenanceCost).toBe(750);
+      expect(result.totalKmTraveled).toBe(100000);
+      expect(result.averageCostPerKm).toBeCloseTo(0.0075, 4);
+      expect(result.maintenanceCount).toBe(2);
+    });
+
+    it('should identify increasing cost trend', async () => {
+      const vehicleWithMaintenance = {
+        ...mockVehicle,
+        maintenanceSchedule: [
+          {
+            id: 1,
+            vehicleId: 1,
+            type: 'oil_change',
+            cost: 300,
+            isCompleted: true,
+            completedDate: new Date('2024-01-01'),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            scheduledOdometer: null,
+            scheduledDate: null,
+            description: null,
+          },
+          {
+            id: 2,
+            vehicleId: 1,
+            type: 'oil_change',
+            cost: 500,
+            isCompleted: true,
+            completedDate: new Date('2024-06-01'),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            scheduledOdometer: null,
+            scheduledDate: null,
+            description: null,
+          },
+        ],
+      };
+
+      mockPrismaService.vehicle.findUnique.mockResolvedValue(vehicleWithMaintenance);
+
+      const result = await service.getVehicleCostAnalysis(1);
+
+      expect(result.costTrend).toBe('increasing');
+    });
+  });
+
+  describe('detectPerformanceAnomaly', () => {
+    it('should detect cost increase anomaly', async () => {
+      const vehicleWithMaintenance = {
+        ...mockVehicle,
+        maintenanceSchedule: [
+          {
+            id: 1,
+            cost: 400,
+            isCompleted: true,
+            completedDate: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            vehicleId: 1,
+            type: 'maintenance',
+            scheduledOdometer: null,
+            scheduledDate: null,
+            description: null,
+          },
+          {
+            id: 2,
+            cost: 380,
+            isCompleted: true,
+            completedDate: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            vehicleId: 1,
+            type: 'maintenance',
+            scheduledOdometer: null,
+            scheduledDate: null,
+            description: null,
+          },
+          {
+            id: 3,
+            cost: 800,
+            isCompleted: true,
+            completedDate: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            vehicleId: 1,
+            type: 'maintenance',
+            scheduledOdometer: null,
+            scheduledDate: null,
+            description: null,
+          },
+        ],
+      };
+
+      mockPrismaService.vehicle.findUnique.mockResolvedValue(vehicleWithMaintenance);
+
+      const result = await service.detectPerformanceAnomaly(1);
+
+      expect(result.hasAnomaly).toBe(true);
+      expect(result.message).toContain('increased');
+    });
+  });
+
   describe('checkMaintenanceAlerts', () => {
     it('should detect approaching maintenance by odometer', async () => {
       const vehicleWithMaintenance = {
