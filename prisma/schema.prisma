@@ -33,12 +33,15 @@ model Vehicle {
   currentOdometer       Float         @default(0)
   state                 String        @default("available")
   maintenanceSchedule   Maintenance[]
+  auditLogs             AuditLog[]
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
+  deletedAt             DateTime?
 
   @@index([state])
   @@index([type])
   @@index([createdAt])
+  @@index([deletedAt])
 }
 
 model Maintenance {
@@ -54,10 +57,33 @@ model Maintenance {
   isCompleted       Boolean   @default(false)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
 
   @@index([vehicleId])
   @@index([isCompleted])
   @@index([type])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model AuditLog {
+  id            Int       @id @default(autoincrement())
+  vehicleId     Int?
+  vehicle       Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  action        String
+  entityType    String
+  entityId      Int
+  changedFields String?
+  oldValues     String?
+  newValues     String?
+  userId        Int?
+  userEmail     String?
+  ipAddress     String?
+  createdAt     DateTime  @default(now())
+
+  @@index([vehicleId])
+  @@index([entityType])
+  @@index([action])
   @@index([createdAt])
 }
 

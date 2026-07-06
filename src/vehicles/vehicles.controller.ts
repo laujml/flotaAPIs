@@ -77,4 +77,9 @@ export class VehiclesController {
   detectPerformanceAnomaly(@Param('id', ParseIntPipe) id: number) {
     return this.vehiclesService.detectPerformanceAnomaly(id);
   }
+
+  @Get(':id/audit-history')
+  getAuditHistory(@Param('id', ParseIntPipe) id: number) {
+    return this.vehiclesService.getAuditHistory(id);
+  }
 }

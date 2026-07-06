@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../common/services/audit.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 import { VALID_STATE_TRANSITIONS, VehicleState, MAINTENANCE_ALERT_THRESHOLDS } from './vehicles.constants';
@@ -7,20 +8,31 @@ import { VehicleCostDto } from './dto/vehicle-cost.dto';
 
 @Injectable()
 export class VehiclesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auditService: AuditService,
+  ) {}
 
   async create(data: CreateVehicleDto) {
-    return this.prisma.vehicle.create({
+    const vehicle = await this.prisma.vehicle.create({
       data: {
         ...data,
         currentOdometer: data.currentOdometer || 0,
         state: 'available',
       },
     });
+
+    await this.auditService.log('CREATE', 'VEHICLE', vehicle.id, {
+      vehicleId: vehicle.id,
+      newValues: vehicle,
+    });
+
+    return vehicle;
   }
 
   async findAll() {
     return this.prisma.vehicle.findMany({
+      where: { deletedAt: null },
       include: { maintenanceSchedule: true },
     });
   }
@@ -31,7 +43,7 @@ export class VehiclesService {
       include: { maintenanceSchedule: true },
     });
 
-    if (!vehicle) {
+    if (!vehicle || vehicle.deletedAt) {
       throw new NotFoundException(`Vehicle with ID ${id} not found`);
     }
 
@@ -39,21 +51,38 @@ export class VehiclesService {
   }
 
   async update(id: number, data: UpdateVehicleDto) {
-    await this.findById(id);
+    const old = await this.findById(id);
 
-    return this.prisma.vehicle.update({
+    const updated = await this.prisma.vehicle.update({
       where: { id },
       data,
       include: { maintenanceSchedule: true },
     });
+
+    await this.auditService.log('UPDATE', 'VEHICLE', id, {
+      vehicleId: id,
+      oldValues: old,
+      newValues: updated,
+    });
+
+    return updated;
   }
 
   async delete(id: number) {
-    await this.findById(id);
+    const vehicle = await this.findById(id);
 
-    return this.prisma.vehicle.delete({
+    const deleted = await this.prisma.vehicle.update({
       where: { id },
+      data: { deletedAt: new Date() },
+      include: { maintenanceSchedule: true },
     });
+
+    await this.auditService.log('SOFT_DELETE', 'VEHICLE', id, {
+      vehicleId: id,
+      oldValues: vehicle,
+    });
+
+    return deleted;
   }
 
   async updateOdometer(id: number, distance: number) {
@@ -184,6 +213,11 @@ export class VehiclesService {
       maintenanceCount: completedMaintenances.length,
       costTrend,
     };
+  }
+
+  async getAuditHistory(id: number) {
+    await this.findById(id);
+    return this.auditService.getVehicleAuditHistory(id);
   }
 
   private calculateCostTrend(
