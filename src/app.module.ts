@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
+import { VehiclesModule } from './vehicles/vehicles.module';
+import { MaintenanceModule } from './maintenance/maintenance.module';
 
 @Module({
   imports: [
@@ -10,8 +12,10 @@ import { UsersModule } from './users/users.module';
     PrismaModule,
     AuthModule,
     UsersModule,
+    VehiclesModule,
+    MaintenanceModule,
     // Integrar aqui los modulos de dominio:
-    // VehiclesModule, DriversModule, TripsModule, FuelModule, MaintenanceModule
+    // DriversModule, TripsModule, FuelModule
   ],
 })
 export class AppModule {}
