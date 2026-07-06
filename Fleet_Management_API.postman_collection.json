@@ -1,0 +1,471 @@
+{
+  "info": {
+    "name": "Fleet Management API - Vehicles & Maintenance",
+    "description": "Complete API workflow for vehicle fleet management including CRUD operations, maintenance scheduling, and efficiency reporting.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('auth_token', jsonData.access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"admin@fleet.local\", \"password\": \"Password123!\"}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicles - Complete Lifecycle",
+      "item": [
+        {
+          "name": "1. Create Vehicle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"plate\": \"TRUCK-123\", \"type\": \"truck\", \"capacity\": 5000, \"currentOdometer\": 50000}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/vehicles",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles"]
+            }
+          }
+        },
+        {
+          "name": "2. Get All Vehicles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/vehicles",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles"]
+            }
+          }
+        },
+        {
+          "name": "3. Get Vehicle Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/vehicles/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles", "1"]
+            }
+          }
+        },
+        {
+          "name": "4. Update Vehicle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"capacity\": 6000}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/vehicles/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Maintenance - Preventive Scheduling",
+      "item": [
+        {
+          "name": "1. Schedule Maintenance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"vehicleId\": 1, \"type\": \"oil_change\", \"scheduledOdometer\": 52000, \"description\": \"Regular oil change\"}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/maintenance",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["maintenance"]
+            }
+          }
+        },
+        {
+          "name": "2. Get Vehicle Maintenance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/maintenance/vehicle/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["maintenance", "vehicle", "1"]
+            }
+          }
+        },
+        {
+          "name": "3. Get Pending Maintenance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/maintenance/vehicle/1/pending",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["maintenance", "vehicle", "1", "pending"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trip Workflow - Odometer & Assignments",
+      "item": [
+        {
+          "name": "1. Check If Vehicle Can Be Assigned",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/vehicles/1/can-assign",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles", "1", "can-assign"]
+            }
+          }
+        },
+        {
+          "name": "2. Update Odometer After Trip (500 km)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"distance\": 500}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/vehicles/1/odometer",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles", "1", "odometer"]
+            }
+          }
+        },
+        {
+          "name": "3. Check Maintenance Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/vehicles/1/maintenance-alerts",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles", "1", "maintenance-alerts"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Maintenance Completion",
+      "item": [
+        {
+          "name": "1. Complete Maintenance (Record Cost)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cost\": 450}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/maintenance/1/complete",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["maintenance", "1", "complete"]
+            }
+          }
+        },
+        {
+          "name": "2. Get Completed Maintenance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/maintenance/vehicle/1/completed",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["maintenance", "vehicle", "1", "completed"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cost Analysis & Intelligence",
+      "item": [
+        {
+          "name": "1. Get Vehicle Cost Analysis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/vehicles/1/cost-analysis",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles", "1", "cost-analysis"]
+            }
+          }
+        },
+        {
+          "name": "2. Detect Performance Anomaly (15% Rule)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/vehicles/1/performance-anomaly",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles", "1", "performance-anomaly"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Fleet Reporting & Benchmarking",
+      "item": [
+        {
+          "name": "1. Get Fleet Efficiency Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/fleet-reports/efficiency",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["fleet-reports", "efficiency"]
+            }
+          }
+        },
+        {
+          "name": "2. Compare Vehicle Against Type",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/fleet-reports/vehicle/1/comparison",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["fleet-reports", "vehicle", "1", "comparison"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit & Data Recovery",
+      "item": [
+        {
+          "name": "1. Get Vehicle Audit History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/vehicles/1/audit-history",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles", "1", "audit-history"]
+            }
+          }
+        },
+        {
+          "name": "2. Delete Vehicle (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/vehicles/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["vehicles", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "auth_token",
+      "value": ""
+    }
+  ]
+}
