@@ -19,24 +19,48 @@ model User {
   email     String   @unique
   password  String
   roleId    Int
-  role      Role     @relation(fields: [roleId], references: [id])
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  role      Role     @relation(fields: [roleId], references: [id])
+}
+
+model Driver {
+  id            Int       @id @default(autoincrement())
+  name          String
+  licenseNumber String    @unique
+  licenseType   String
+  licenseExpiry DateTime
+  phone         String?
+  email         String?   @unique
+  address       String?
+  hireDate      DateTime  @default(now())
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  trips         Trip[]
+
+  @@index([licenseNumber])
+  @@index([isActive])
+  @@index([licenseExpiry])
+  @@index([deletedAt])
 }
 
 model Vehicle {
-  id                    Int           @id @default(autoincrement())
-  plate                 String        @unique
-  type                  String
-  capacity              Float
-  currentOdometer       Float         @default(0)
-  state                 String        @default("available")
-  maintenanceSchedule   Maintenance[]
-  auditLogs             AuditLog[]
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime      @updatedAt
-  deletedAt             DateTime?
+  id                  Int           @id @default(autoincrement())
+  plate               String        @unique
+  type                String
+  capacity            Float
+  currentOdometer     Float         @default(0)
+  state               String        @default("available")
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+  auditLogs           AuditLog[]
+  fuelRecords         FuelRecord[]
+  maintenanceSchedule Maintenance[]
+  trips               Trip[]
 
   @@index([state])
   @@index([type])
@@ -44,10 +68,56 @@ model Vehicle {
   @@index([deletedAt])
 }
 
+model Trip {
+  id            Int          @id @default(autoincrement())
+  driverId      Int
+  vehicleId     Int
+  origin        String
+  destination   String
+  distance      Float        @default(0)
+  cargoWeight   Float        @default(0)
+  startOdometer Float        @default(0)
+  endOdometer   Float?
+  startDate     DateTime     @default(now())
+  endDate       DateTime?
+  status        String       @default("planned")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  deletedAt     DateTime?
+  fuelRecords   FuelRecord[]
+  vehicle       Vehicle      @relation(fields: [vehicleId], references: [id])
+  driver        Driver       @relation(fields: [driverId], references: [id])
+
+  @@index([driverId])
+  @@index([vehicleId])
+  @@index([status])
+  @@index([startDate])
+  @@index([deletedAt])
+}
+
+model FuelRecord {
+  id            Int      @id @default(autoincrement())
+  tripId        Int
+  vehicleId     Int
+  liters        Float
+  cost          Float
+  pricePerLiter Float
+  odometer      Float
+  date          DateTime @default(now())
+  station       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id])
+  trip          Trip     @relation(fields: [tripId], references: [id])
+
+  @@index([tripId])
+  @@index([vehicleId])
+  @@index([date])
+}
+
 model Maintenance {
   id                Int       @id @default(autoincrement())
   vehicleId         Int
-  vehicle           Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   type              String
   scheduledOdometer Float?
   scheduledDate     DateTime?
@@ -58,6 +128,7 @@ model Maintenance {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   deletedAt         DateTime?
+  vehicle           Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
   @@index([vehicleId])
   @@index([isCompleted])
@@ -67,9 +138,8 @@ model Maintenance {
 }
 
 model AuditLog {
-  id            Int       @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   vehicleId     Int?
-  vehicle       Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
   action        String
   entityType    String
   entityId      Int
@@ -79,11 +149,11 @@ model AuditLog {
   userId        Int?
   userEmail     String?
   ipAddress     String?
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime @default(now())
+  vehicle       Vehicle? @relation(fields: [vehicleId], references: [id])
 
   @@index([vehicleId])
   @@index([entityType])
   @@index([action])
   @@index([createdAt])
 }
-

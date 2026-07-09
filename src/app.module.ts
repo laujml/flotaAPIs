@@ -5,6 +5,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
+import { DriversModule } from './drivers/drivers.module';
+import { TripsModule } from './trips/trips.module';
+import { FuelRecordsModule } from './fuel-records/fuel-records.module';
 
 @Module({
   imports: [
@@ -14,8 +17,9 @@ import { MaintenanceModule } from './maintenance/maintenance.module';
     UsersModule,
     VehiclesModule,
     MaintenanceModule,
-    // Integrar aqui los modulos de dominio:
-    // DriversModule, TripsModule, FuelModule
+    DriversModule,
+    TripsModule,
+    FuelRecordsModule,
   ],
 })
 export class AppModule {}
