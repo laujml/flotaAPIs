@@ -49,7 +49,6 @@ export class FleetReportService {
       })),
       recommendations: this.generateRecommendations(
         vehiclesNeedingAttention,
-        averageFleetCost,
       ),
     };
   }
