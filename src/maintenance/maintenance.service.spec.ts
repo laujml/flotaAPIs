@@ -1,5 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MaintenanceService } from './maintenance.service';
+import { VehiclesService } from '../vehicles/vehicles.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 describe('MaintenanceService', () => {

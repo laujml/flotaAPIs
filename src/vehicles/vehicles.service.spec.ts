@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VehiclesService } from './vehicles.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../common/services/audit.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
