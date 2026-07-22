@@ -1,16 +1,17 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaClient, FuelRecord, Trip, Vehicle } from '@prisma/client';
+import { FuelRecord, Trip, Vehicle } from '@prisma/client';
 import { CreateFuelRecordDto } from './dto/create-fuel-record.dto';
 import { UpdateFuelRecordDto } from './dto/update-fuel-record.dto';
 import { FuelRecordResponseDto } from './dto/fuel-record-response.dto';
-
-const prisma = new PrismaClient();
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class FuelRecordsService {
+  constructor(private readonly prisma: PrismaService) {}
+
   async create(createFuelRecordDto: CreateFuelRecordDto): Promise<FuelRecordResponseDto> {
     // Verify trip exists
-    const trip = await prisma.trip.findUnique({
+    const trip = await this.prisma.trip.findUnique({
       where: { id: createFuelRecordDto.tripId },
     });
 
@@ -19,7 +20,7 @@ export class FuelRecordsService {
     }
 
     // Verify vehicle exists
-    const vehicle = await prisma.vehicle.findUnique({
+    const vehicle = await this.prisma.vehicle.findUnique({
       where: { id: createFuelRecordDto.vehicleId },
     });
 
@@ -48,7 +49,7 @@ export class FuelRecordsService {
       );
     }
 
-    const fuelRecord = await prisma.fuelRecord.create({
+    const fuelRecord = await this.prisma.fuelRecord.create({
       data: {
         tripId: createFuelRecordDto.tripId,
         vehicleId: createFuelRecordDto.vehicleId,
@@ -69,7 +70,7 @@ export class FuelRecordsService {
   }
 
   async findAll(): Promise<FuelRecordResponseDto[]> {
-    const fuelRecords = await prisma.fuelRecord.findMany({
+    const fuelRecords = await this.prisma.fuelRecord.findMany({
       include: {
         trip: true,
         vehicle: true,
@@ -81,7 +82,7 @@ export class FuelRecordsService {
   }
 
   async findByTripId(tripId: number): Promise<FuelRecordResponseDto[]> {
-    const trip = await prisma.trip.findUnique({
+    const trip = await this.prisma.trip.findUnique({
       where: { id: tripId },
     });
 
@@ -89,7 +90,7 @@ export class FuelRecordsService {
       throw new NotFoundException(`Trip with ID ${tripId} not found`);
     }
 
-    const fuelRecords = await prisma.fuelRecord.findMany({
+    const fuelRecords = await this.prisma.fuelRecord.findMany({
       where: { tripId },
       include: {
         trip: true,
@@ -102,7 +103,7 @@ export class FuelRecordsService {
   }
 
   async findByVehicleId(vehicleId: number): Promise<FuelRecordResponseDto[]> {
-    const vehicle = await prisma.vehicle.findUnique({
+    const vehicle = await this.prisma.vehicle.findUnique({
       where: { id: vehicleId },
     });
 
@@ -110,7 +111,7 @@ export class FuelRecordsService {
       throw new NotFoundException(`Vehicle with ID ${vehicleId} not found`);
     }
 
-    const fuelRecords = await prisma.fuelRecord.findMany({
+    const fuelRecords = await this.prisma.fuelRecord.findMany({
       where: { vehicleId },
       include: {
         trip: true,
@@ -123,7 +124,7 @@ export class FuelRecordsService {
   }
 
   async findOne(id: number): Promise<FuelRecordResponseDto> {
-    const fuelRecord = await prisma.fuelRecord.findUnique({
+    const fuelRecord = await this.prisma.fuelRecord.findUnique({
       where: { id },
       include: {
         trip: true,
@@ -139,7 +140,7 @@ export class FuelRecordsService {
   }
 
   async update(id: number, updateFuelRecordDto: UpdateFuelRecordDto): Promise<FuelRecordResponseDto> {
-    const existingRecord = await prisma.fuelRecord.findUnique({
+    const existingRecord = await this.prisma.fuelRecord.findUnique({
       where: { id },
       include: { trip: true },
     });
@@ -153,12 +154,12 @@ export class FuelRecordsService {
       const tripId = updateFuelRecordDto.tripId ?? existingRecord.tripId;
       const vehicleId = updateFuelRecordDto.vehicleId ?? existingRecord.vehicleId;
 
-      const trip = await prisma.trip.findUnique({ where: { id: tripId } });
+      const trip = await this.prisma.trip.findUnique({ where: { id: tripId } });
       if (!trip) {
         throw new NotFoundException(`Trip with ID ${tripId} not found`);
       }
 
-      const vehicle = await prisma.vehicle.findUnique({ where: { id: vehicleId } });
+      const vehicle = await this.prisma.vehicle.findUnique({ where: { id: vehicleId } });
       if (!vehicle) {
         throw new NotFoundException(`Vehicle with ID ${vehicleId} not found`);
       }
@@ -182,7 +183,7 @@ export class FuelRecordsService {
       }
     }
 
-    const fuelRecord = await prisma.fuelRecord.update({
+    const fuelRecord = await this.prisma.fuelRecord.update({
       where: { id },
       data: {
         ...updateFuelRecordDto,
@@ -198,7 +199,7 @@ export class FuelRecordsService {
   }
 
   async remove(id: number): Promise<void> {
-    const fuelRecord = await prisma.fuelRecord.findUnique({
+    const fuelRecord = await this.prisma.fuelRecord.findUnique({
       where: { id },
     });
 
@@ -206,7 +207,7 @@ export class FuelRecordsService {
       throw new NotFoundException(`Fuel record with ID ${id} not found`);
     }
 
-    await prisma.fuelRecord.delete({
+    await this.prisma.fuelRecord.delete({
       where: { id },
     });
   }
@@ -219,7 +220,7 @@ export class FuelRecordsService {
     kmPerGallon: number;
     averagePricePerLiter: number;
   }> {
-    const trip = await prisma.trip.findUnique({
+    const trip = await this.prisma.trip.findUnique({
       where: { id: tripId },
       include: { fuelRecords: true },
     });

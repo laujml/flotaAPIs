@@ -50,16 +50,16 @@ export class AnalyticsService {
     });
 
     const fuelCostAgg = await this.prisma.fuelRecord.aggregate({
-      _sum: { totalCost: true },
+      _sum: { cost: true },
     });
 
-    const maintCostAgg = await this.prisma.maintenanceSchedule.aggregate({
+    const maintCostAgg = await this.prisma.maintenance.aggregate({
       where: { isCompleted: true, deletedAt: null },
       _sum: { cost: true },
     });
 
     const totalKm = totalKmAgg._sum.currentOdometer || 0;
-    const totalFuelCost = fuelCostAgg._sum.totalCost || 0;
+    const totalFuelCost = fuelCostAgg._sum.cost || 0;
     const totalMaintenanceCost = maintCostAgg._sum.cost || 0;
     const totalOperationalCost = totalFuelCost + totalMaintenanceCost;
     const avgCostPerKm = totalKm > 0 ? totalOperationalCost / totalKm : 0;
@@ -114,7 +114,7 @@ export class AnalyticsService {
       ]),
     );
 
-    const maintCount = await this.prisma.maintenanceSchedule.groupBy({
+    const maintCount = await this.prisma.maintenance.groupBy({
       by: ['vehicleId'],
       where: { isCompleted: true, deletedAt: null },
       _count: { id: true },
@@ -200,7 +200,7 @@ export class AnalyticsService {
       FROM drivers d
       LEFT JOIN trips t ON t."driverId" = d.id AND t.status = 'completed' AND t."deletedAt" IS NULL
       LEFT JOIN (
-        SELECT fr."tripId", SUM(fr.liters) as total_liters, SUM(fr."totalCost") as total_fuel
+        SELECT fr."tripId", SUM(fr.liters) as total_liters, SUM(fr.cost) as total_fuel
         FROM fuel_records fr
         GROUP BY fr."tripId"
       ) fr_agg ON fr_agg."tripId" = t.id

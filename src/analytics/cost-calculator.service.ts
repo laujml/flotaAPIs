@@ -30,16 +30,16 @@ export class CostCalculatorService {
     // Consulta agregada: costo total de combustible
     const fuelAgg = await this.prisma.fuelRecord.aggregate({
       where: { vehicleId },
-      _sum: { totalCost: true },
+      _sum: { cost: true },
     });
 
     // Consulta agregada: costo total de mantenimiento completado
-    const maintAgg = await this.prisma.maintenanceSchedule.aggregate({
+    const maintAgg = await this.prisma.maintenance.aggregate({
       where: { vehicleId, isCompleted: true, deletedAt: null },
       _sum: { cost: true },
     });
 
-    const totalFuelCost = fuelAgg._sum.totalCost || 0;
+    const totalFuelCost = fuelAgg._sum.cost || 0;
     const totalMaintenanceCost = maintAgg._sum.cost || 0;
     const totalOperationalCost = totalFuelCost + totalMaintenanceCost;
     const totalKm = vehicle.currentOdometer;
@@ -76,18 +76,18 @@ export class CostCalculatorService {
     const fuelByVehicle = await this.prisma.fuelRecord.groupBy({
       by: ['vehicleId'],
       where: { vehicleId: { in: vehicleIds } },
-      _sum: { totalCost: true },
+      _sum: { cost: true },
     });
 
     // Consulta agregada GROUP BY para mantenimiento por vehículo
-    const maintByVehicle = await this.prisma.maintenanceSchedule.groupBy({
+    const maintByVehicle = await this.prisma.maintenance.groupBy({
       by: ['vehicleId'],
       where: { vehicleId: { in: vehicleIds }, isCompleted: true, deletedAt: null },
       _sum: { cost: true },
     });
 
     // Mapas de búsqueda rápida
-    const fuelMap = new Map(fuelByVehicle.map((r) => [r.vehicleId, r._sum.totalCost || 0]));
+    const fuelMap = new Map(fuelByVehicle.map((r) => [r.vehicleId, r._sum.cost || 0]));
     const maintMap = new Map(maintByVehicle.map((r) => [r.vehicleId, r._sum.cost || 0]));
 
     return vehicles.map((v) => {
