@@ -6,12 +6,11 @@ import {
   Delete,
   Body,
   Param,
-  Query,
   ParseIntPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { FuelRecordsService } from './fuel-records.service';
 import { CreateFuelRecordDto } from './dto/create-fuel-record.dto';
 import { UpdateFuelRecordDto } from './dto/update-fuel-record.dto';

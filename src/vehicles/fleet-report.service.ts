@@ -89,7 +89,6 @@ export class FleetReportService {
 
   private generateRecommendations(
     vehiclesNeedingAttention: any[],
-    averageFleetCost: number,
   ): string[] {
     const recommendations: string[] = [];
 

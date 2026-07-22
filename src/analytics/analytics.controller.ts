@@ -3,7 +3,6 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery, ApiParam } from '@nestj
 import { AnalyticsService } from './analytics.service';
 import { AlertsService } from './alerts.service';
 import { CostCalculatorService } from './cost-calculator.service';
-import { AlertDto, VehicleCostPerKmDto } from './dto/alert.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';

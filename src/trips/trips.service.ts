@@ -261,7 +261,7 @@ export class TripsService {
       let performance: TripPerformanceDto | undefined;
       try {
         performance = await this.fuelRecordsService.calculateTripPerformance(id);
-      } catch (error) {
+      } catch {
         // If no fuel records exist, performance will be undefined
         // This is expected behavior - not all trips have fuel records
       }

@@ -3,7 +3,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../common/services/audit.service';
 import { CreateDriverDto } from './dto/create-driver.dto';
 import { UpdateDriverDto } from './dto/update-driver.dto';
-import { LicenseType } from './dto/create-driver.dto';
 
 @Injectable()
 export class DriversService {

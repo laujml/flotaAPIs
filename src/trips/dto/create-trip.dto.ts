@@ -1,4 +1,4 @@
-import { IsInt, IsString, IsNumber, IsOptional, IsDateString, Min, Max } from 'class-validator';
+import { IsInt, IsString, IsNumber, IsOptional, IsDateString, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateTripDto {

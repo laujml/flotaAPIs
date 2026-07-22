@@ -1,13 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MaintenanceService } from './maintenance.service';
-import { VehiclesService } from '../vehicles/vehicles.service';
-import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 describe('MaintenanceService', () => {
   let service: MaintenanceService;
-  let prismaService: PrismaService;
-  let vehiclesService: VehiclesService;
 
   const mockVehicle = {
     id: 1,
@@ -67,8 +63,6 @@ describe('MaintenanceService', () => {
     }).compile();
 
     service = module.get<MaintenanceService>(MaintenanceService);
-    prismaService = module.get<PrismaService>(PrismaService);
-    vehiclesService = module.get<VehiclesService>(VehiclesService);
   });
 
   afterEach(() => {

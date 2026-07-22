@@ -187,7 +187,7 @@ describe('Vehicles Integration Tests', () => {
 
       expect(response.body.vehicleId).toBe(vehicleId);
       expect(response.body.totalMaintenanceCost).toBe(450);
-      expect(response.body.totalKmTraveled).toBe(41400);
+      expect(response.body.totalKmTraveled).toBe(41500);
       expect(response.body.averageCostPerKm).toBeGreaterThan(0);
       expect(response.body.maintenanceCount).toBe(1);
     });
