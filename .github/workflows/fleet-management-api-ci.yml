@@ -11,7 +11,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: file:./dev.db
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/flota_ci?schema=public
       JWT_SECRET: ci-access-secret
       JWT_REFRESH_SECRET: ci-refresh-secret
       JWT_EXPIRES_IN: 15m
