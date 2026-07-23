@@ -1,54 +1,57 @@
 -- CreateTable
 CREATE TABLE "Driver" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "licenseNumber" TEXT NOT NULL,
     "licenseType" TEXT NOT NULL,
-    "licenseExpiry" DATETIME NOT NULL,
+    "licenseExpiry" TIMESTAMP(3) NOT NULL,
     "phone" TEXT,
     "email" TEXT,
     "address" TEXT,
-    "hireDate" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "hireDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    "deletedAt" DATETIME
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+    CONSTRAINT "Driver_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Trip" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "driverId" INTEGER NOT NULL,
     "vehicleId" INTEGER NOT NULL,
     "origin" TEXT NOT NULL,
     "destination" TEXT NOT NULL,
-    "distance" REAL NOT NULL DEFAULT 0,
-    "cargoWeight" REAL NOT NULL DEFAULT 0,
-    "startOdometer" REAL NOT NULL DEFAULT 0,
-    "endOdometer" REAL,
-    "startDate" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "endDate" DATETIME,
+    "distance" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "cargoWeight" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "startOdometer" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "endOdometer" DOUBLE PRECISION,
+    "startDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "endDate" TIMESTAMP(3),
     "status" TEXT NOT NULL DEFAULT 'planned',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    "deletedAt" DATETIME,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+    CONSTRAINT "Trip_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "Trip_driverId_fkey" FOREIGN KEY ("driverId") REFERENCES "Driver" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "Trip_vehicleId_fkey" FOREIGN KEY ("vehicleId") REFERENCES "Vehicle" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
 CREATE TABLE "FuelRecord" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "tripId" INTEGER NOT NULL,
     "vehicleId" INTEGER NOT NULL,
-    "liters" REAL NOT NULL,
-    "cost" REAL NOT NULL,
-    "pricePerLiter" REAL NOT NULL,
-    "odometer" REAL NOT NULL,
-    "date" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "liters" DOUBLE PRECISION NOT NULL,
+    "cost" DOUBLE PRECISION NOT NULL,
+    "pricePerLiter" DOUBLE PRECISION NOT NULL,
+    "odometer" DOUBLE PRECISION NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "station" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    CONSTRAINT "FuelRecord_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "FuelRecord_tripId_fkey" FOREIGN KEY ("tripId") REFERENCES "Trip" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "FuelRecord_vehicleId_fkey" FOREIGN KEY ("vehicleId") REFERENCES "Vehicle" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );

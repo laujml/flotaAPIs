@@ -68,8 +68,8 @@ export class AnalyticsService {
     const fleetPerf = await this.prisma.$queryRaw<{ km_per_gallon: number }[]>`
       SELECT
         (SUM(t.distance) / (SUM(fr.liters) * ${GALON_A_LITROS})) as km_per_gallon
-      FROM trips t
-      INNER JOIN fuel_records fr ON fr."tripId" = t.id
+      FROM "Trip" t
+      INNER JOIN "FuelRecord" fr ON fr."tripId" = t.id
       WHERE t.status = 'completed'
         AND t."deletedAt" IS NULL
     `;
@@ -132,8 +132,8 @@ export class AnalyticsService {
       SELECT
         t."vehicleId",
         (SUM(t.distance) / (SUM(fr.liters) * ${GALON_A_LITROS})) as km_per_gallon
-      FROM trips t
-      INNER JOIN fuel_records fr ON fr."tripId" = t.id
+      FROM "Trip" t
+      INNER JOIN "FuelRecord" fr ON fr."tripId" = t.id
       WHERE t.status = 'completed' AND t."deletedAt" IS NULL
       GROUP BY t."vehicleId"
     `;
@@ -197,11 +197,11 @@ export class AnalyticsService {
           THEN (SUM(t.distance) / (SUM(fr_agg.total_liters) * ${GALON_A_LITROS}))
           ELSE 0
         END as "km_per_gallon"
-      FROM drivers d
-      LEFT JOIN trips t ON t."driverId" = d.id AND t.status = 'completed' AND t."deletedAt" IS NULL
+      FROM "Driver" d
+      LEFT JOIN "Trip" t ON t."driverId" = d.id AND t.status = 'completed' AND t."deletedAt" IS NULL
       LEFT JOIN (
         SELECT fr."tripId", SUM(fr.liters) as total_liters, SUM(fr.cost) as total_fuel
-        FROM fuel_records fr
+        FROM "FuelRecord" fr
         GROUP BY fr."tripId"
       ) fr_agg ON fr_agg."tripId" = t.id
       WHERE d."deletedAt" IS NULL

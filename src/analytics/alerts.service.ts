@@ -28,8 +28,8 @@ export class AlertsService {
       SELECT
         t."vehicleId",
         (SUM(t.distance) / (SUM(fr.liters) * ${GALON_A_LITROS})) as km_per_gallon
-      FROM trips t
-      INNER JOIN fuel_records fr ON fr."tripId" = t.id
+      FROM "Trip" t
+      INNER JOIN "FuelRecord" fr ON fr."tripId" = t.id
       WHERE t.status = 'completed'
         AND t."deletedAt" IS NULL
         AND t."endOdometer" IS NOT NULL

@@ -2,7 +2,6 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import { execSync } from 'child_process';
-import { closeSync, openSync } from 'fs';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
@@ -15,11 +14,9 @@ describe('Fleet Management API (e2e)', () => {
   let driverToken: string;
 
   beforeAll(async () => {
-    process.env.DATABASE_URL = 'file:./test.db';
+    process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/flota_apis_test?schema=public';
     process.env.JWT_SECRET = 'test-access-secret';
     process.env.JWT_REFRESH_SECRET = 'test-refresh-secret';
-
-    closeSync(openSync('prisma/test.db', 'a'));
 
     const prismaPushCommand =
       process.platform === 'win32'

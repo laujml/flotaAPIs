@@ -1,5 +1,74 @@
 # Flujo Completo: Conductores ↔ Viajes ↔ Combustible
 
+## Vista General del Proyecto
+
+```mermaid
+flowchart LR
+        U[Usuario / Operador] --> A[API NestJS]
+        A --> B[Auth + Roles]
+        A --> C[Trips]
+        A --> D[Drivers]
+        A --> E[Vehicles]
+        A --> F[Fuel Records]
+        A --> G[Maintenance]
+        A --> H[Audit]
+
+        C --> I[Prisma ORM]
+        D --> I
+        E --> I
+        F --> I
+        G --> I
+        H --> I
+
+        I --> J[(PostgreSQL / Prisma Schema)]
+
+        C --> K[Validaciones de negocio]
+        E --> K
+        F --> K
+
+        K --> L[Evita duplicidades]
+        K --> M[Controla disponibilidad]
+        K --> N[Calcula rendimiento]
+```
+
+## Flujo Operativo del Negocio
+
+```mermaid
+flowchart TD
+        A[Registrar conductor y vehículo] --> B[Crear viaje]
+        B --> C{Conductor activo y vehículo disponible?}
+        C -->|No| D[Rechazar operación]
+        C -->|Sí| E[Iniciar viaje]
+        E --> F[Registrar consumos de combustible]
+        F --> G[Actualizar odómetro y estado]
+        G --> H[Completar viaje]
+        H --> I[Calcular rendimiento]
+        I --> J[Generar trazabilidad y auditoría]
+```
+
+## Diferenciador del Sistema
+
+```mermaid
+mindmap
+    root((Proyecto))
+        Control operativo
+            Viajes únicos
+            Vehículos disponibles
+            Conductores activos
+        Eficiencia
+            Consumo de combustible
+            Rendimiento km/galón
+            Reducción de errores
+        Trazabilidad
+            Auditoría
+            Historial por viaje
+            Estado de flota
+        Enfoque de negocio
+            Una sucursal
+            MVP claro
+            Escalable por etapas
+```
+
 ## Diagrama Entidad-Relación (Mermaid)
 
 ```mermaid

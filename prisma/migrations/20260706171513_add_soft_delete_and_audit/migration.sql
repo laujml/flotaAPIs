@@ -1,12 +1,12 @@
 -- AlterTable
-ALTER TABLE "Maintenance" ADD COLUMN "deletedAt" DATETIME;
+ALTER TABLE "Maintenance" ADD COLUMN "deletedAt" TIMESTAMP(3);
 
 -- AlterTable
-ALTER TABLE "Vehicle" ADD COLUMN "deletedAt" DATETIME;
+ALTER TABLE "Vehicle" ADD COLUMN "deletedAt" TIMESTAMP(3);
 
 -- CreateTable
 CREATE TABLE "AuditLog" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "vehicleId" INTEGER,
     "action" TEXT NOT NULL,
     "entityType" TEXT NOT NULL,
@@ -17,7 +17,8 @@ CREATE TABLE "AuditLog" (
     "userId" INTEGER,
     "userEmail" TEXT,
     "ipAddress" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "AuditLog_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "AuditLog_vehicleId_fkey" FOREIGN KEY ("vehicleId") REFERENCES "Vehicle" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
