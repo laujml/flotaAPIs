@@ -28,7 +28,7 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
 1. Clona el repositorio:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/laujml/flotaAPIs.git
 cd flotaAPIs
 ```
 
